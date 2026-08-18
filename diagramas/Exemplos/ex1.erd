@@ -4,7 +4,7 @@
   "settings": {
     "width": 2000,
     "height": 2000,
-    "scrollTop": -57.3316,
+    "scrollTop": -83.3333,
     "scrollLeft": 0,
     "zoomLevel": 1,
     "show": 431,
@@ -452,7 +452,7 @@
         "name": "custo",
         "comment": "",
         "dataType": "money",
-        "default": "",
+        "default": "0",
         "options": 8,
         "ui": {
           "keys": 0,
@@ -462,7 +462,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1785867094474,
+          "updateAt": 1787078359750,
           "createAt": 1785867073246
         }
       },
@@ -492,7 +492,7 @@
         "name": "localizacao",
         "comment": "",
         "dataType": "char(1)",
-        "default": "",
+        "default": "E",
         "options": 8,
         "ui": {
           "keys": 0,
@@ -502,7 +502,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1785867269989,
+          "updateAt": 1787078357268,
           "createAt": 1785867221844
         }
       },
