@@ -1,8 +1,8 @@
-
+--Tabela categoria
 CREATE TABLE IF NOT EXISTS categoria (
     nome VARCHAR(50) NOT NULL,
     id SERIAL2 NOT NULL,
-    CONSTRAINT pk_categoria PRIMARY KEY(id),
+    CONSTRAINT pk_categoria PRIMARY KEY(id)
 );
 
 --Tabela produto
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS produto (
 );
 
 
--- Tabela lote
+--Tabela lote
 CREATE TABLE IF NOT EXISTS lote (
     data_fabricacao DATE NOT NULL,
     data_validade DATE NOT NULL,
