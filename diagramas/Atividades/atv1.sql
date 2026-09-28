@@ -366,3 +366,33 @@ ORDER BY o.ano, o.mes, p.nome;
 
 */
 
+CREATE OR REPLACE PROCEDURE buscar_lotacao_atual(encontrar_idequipamento INT, INOUT nome_ambiente TEXT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    SELECT a.nome INTO nome_ambiente
+    FROM equipamento e 
+    INNER JOIN lotacao l ON e.id = l.idequipamento
+    INNER JOIN ambiente a ON  a.id = l.idambiente
+    INNER JOIN tipoambiente ta ON ta.id = a.idtipoambiente
+    INNER JOIN pessoa p ON p.id = l.idpessoa
+    INNER JOIN tipoequipamento te ON te.id = e.idtipoequipamento
+    WHERE e.id = encontrar_idequipamento AND l.data_saida IS NULL;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION capacidade_pessoas_area(area_ambiente NUMERIC)   
+RETURNS NUMERIC
+LANGUAGE plpgsql 
+AS $$
+DECLARE 
+    metro_quadrado_pessoa NUMERIC := 2;
+BEGIN
+    IF area_ambiente < 0 OR area_ambiente IS NULL THEN
+    RETURN 0;
+    END IF;
+
+    RETURN DIV(area_ambiente,metro_quadrado_pessoa);
+END;
+$$;
