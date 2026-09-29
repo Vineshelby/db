@@ -396,3 +396,25 @@ BEGIN
     RETURN DIV(area_ambiente,metro_quadrado_pessoa);
 END;
 $$;
+
+
+CREATE OR REPLACE PROCEDURE mudar_lotacao(usuario_resp INT, idequipamento_troca INT, idambiente_destino INT)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    INSERT_OK INT;
+BEGIN
+    UPDATE lotacao SET data_saida = CURRENT_DATE WHERE idequipamento = idequipamento_troca AND data_saida IS NULL;
+
+    INSERT INTO lotacao (data_entrada, data_saida, idequipamento, idambiente, idpessoa) VALUES 
+    (CURRENT_DATE, NULL, idequipamento_troca, idambiente_destino, usuario_resp) returning id INTO INSERT_OK;
+    
+    IF(INSERT_OK > 0) THEN
+        COMMIT;
+    ELSE 
+        ROLLBACK;   
+    END IF; 
+END;
+$$;
+
+
