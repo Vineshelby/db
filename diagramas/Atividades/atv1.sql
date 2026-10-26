@@ -417,4 +417,127 @@ BEGIN
 END;
 $$;
 
+  ========================
+CREATE TABLE log_usuario(
+    idusuario INT NOT NULL,
+    data_operacao TIMESTAMP NOT NULL
+);
 
+CREATE OR REPLACE FUNCTION usuario_log_func()
+RETURNS trigger AS $usuario_trigger$
+BEGIN
+    INSERT INTO log_usuario(idusuario, data_operacao)
+    VALUES (NEW.id, CURRENT_TIMESTAMP);
+
+    RETURN NEW;
+END;
+$usuario_trigger$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER log_trigger_usuario
+AFTER INSERT ON pessoa
+FOR EACH ROW
+EXECUTE PROCEDURE usuario_log_func();
+
+INSERT INTO pessoa (nome, email, telefone, cargo) VALUES
+('JP', 'JP02@gmail.com', '65 99810-6458', 'Diretor');
+
+
+
+ALTER TABLE log_usuario
+ADD COLUMN operacao VARCHAR(150);
+
+
+CREATE OR REPLACE FUNCTION usuario_log_function()
+RETURNS trigger AS $usuario_trigger$
+BEGIN
+    -- Aqui temos um bloco IF que confirmará o tipo de operação.
+    IF (TG_OP = 'INSERT') THEN
+        INSERT INTO log_usuario (idusuario, data_operacao, operacao)
+        VALUES (new.id, CURRENT_TIMESTAMP, 'Operação de inserção. A linha de código ' || NEW.id || ' foi inserida.');
+        RETURN NEW;
+    -- Aqui temos um bloco IF que confirmará o tipo de operação UPDATE.
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO log_usuario (idusuario, data_operacao, operacao)
+        VALUES (NEW.id, CURRENT_TIMESTAMP, 'Operação de UPDATE. A linha de código ' || NEW.id || ' teve os valores atualizados ' || OLD || ' por ' || NEW.* || '.');
+        RETURN NEW;
+    -- Aqui temos um bloco IF que confirmará o tipo de operação DELETE
+    ELSIF (TG_OP = 'DELETE') THEN
+        INSERT INTO log_usuario (idusuario, data_operacao, operacao)
+        VALUES (OLD.id, CURRENT_TIMESTAMP, 'Operação DELETE. A linha de código ' || OLD.id || ' foi excluída.');
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$usuario_trigger$ LANGUAGE plpgsql;
+
+CREATE TRIGGER log_trigger_usuario_todas_as_operacoes
+AFTER INSERT OR UPDATE OR DELETE ON pessoa
+FOR EACH ROW
+EXECUTE PROCEDURE usuario_log_function();
+
+INSERT INTO pessoa (nome, email, telefone, cargo) VALUES
+('sixsevodasilva', 'pedrin67@gmail.com', '65 99810-6767', 'Professor');
+
+
+
+
+UPDATE pessoa SET cargo = 'Aluno' WHERE id = 11;
+
+ALTER TABLE log_usuario 
+DROP COLUMN operacao;
+
+
+
+ALTER TABLE log_usuario
+ADD COLUMN operacao VARCHAR(500);
+
+
+-- Alterar equipamento ativo/inaitivo ao ir pra manutenção/doação/lotacao
+
+
+
+
+
+===========================================
+
+CREATE OR REPLACE FUNCTION inativar_equipamento()
+RETURNS trigger AS $usuario_trigger$
+BEGIN
+    UPDATE equipamento SET ativo = false WHERE id = NEW.idequipamento;
+    RETURN NEW;
+END;
+$usuario_trigger$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_entrada_manutencao
+AFTER INSERT ON manutencao
+FOR EACH ROW
+EXECUTE PROCEDURE inativar_equipamento();
+
+
+
+
+CREATE OR REPLACE FUNCTION ativar_equipamento()
+RETURNS trigger AS $usuario_trigger$
+BEGIN
+    IF NEW.data_saida IS NOT NULL THEN
+        UPDATE equipamento SET ativo = true WHERE id = NEW.idequipamento;
+    END IF;
+
+    RETURN NEW;
+END;
+$usuario_trigger$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_saida_manutencao
+AFTER UPDATE ON manutencao
+FOR EACH ROW
+EXECUTE PROCEDURE ativar_equipamento();
+
+
+INSERT INTO manutencao (idequipamento, idpessoa, responsavel, nome_problema, custo, data_entrada)
+VALUES
+(5, 1, 'JP', 'Não liga', 100.00, CURRENT_DATE);
+
+
+
+UPDATE manutencao SET data_saida = CURRENT_DATE WHERE id = 12;
